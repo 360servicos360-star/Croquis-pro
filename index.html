@@ -1,890 +1,114 @@
 <!doctype html>
 <html lang="pt-AO">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Croquis Pro</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
-<style>
-:root{
-  --ink:#14212e; --steel:#3d5568; --paper:#eef1f4; --surface:#fff; --line:#cdd5dc;
-  --red:#a3262f; --red-d:#821d25; --amber:#e8892b; --ok:#1f7a4d;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{font-family:Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.4;padding-bottom:70px}
-.top{background:var(--ink);color:#fff;padding:12px 16px;display:flex;align-items:baseline;gap:12px}
-.top b{font-size:19px;letter-spacing:.2px}
-.top span{font-size:12.5px;color:#aebccb}
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--ink);border-top:3px solid var(--amber)}
-.tabs button{flex:1;padding:14px 4px;background:none;border:0;color:#aebccb;font:inherit;font-weight:600}
-.tabs button.on{color:#fff;background:#223445}
-main{max-width:1280px;margin:0 auto;padding:12px}
-.view{display:none}
-.view.on{display:block}
-h2{font-size:17px;margin:6px 0 10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid .full{grid-column:1/-1}
-label{display:block;font-size:13px;color:var(--steel);font-weight:600}
-input,select,textarea{width:100%;margin-top:3px;padding:10px;border:1px solid #aeb9c3;border-radius:4px;font:inherit;color:var(--ink);background:#fff}
-textarea{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;min-height:130px;resize:vertical}
-input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid #f3b36a;outline-offset:1px}
-details{border-top:1px solid var(--line);padding:8px 0}
-details:first-of-type{border-top:0}
-summary{cursor:pointer;font-weight:700;padding:6px 0}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-button.b{padding:11px 14px;border-radius:4px;border:1px solid var(--steel);background:#fff;color:var(--ink);font:inherit;font-weight:600}
-button.p{background:var(--red);border-color:var(--red);color:#fff}
-button.p:active{background:var(--red-d)}
-.hint{font-size:12.5px;color:#5a6b7a;margin:6px 0 0}
-#msg{margin:8px 0;padding:9px 11px;border-radius:4px;font-size:13.5px;display:none}
-#msg.err{display:block;background:#fde8ea;color:#7b1620;border:1px solid #f1b5bb}
-#msg.ok{display:block;background:#e6f4ec;color:#14573a;border:1px solid #b5dcc5}
-#pick{height:300px;border:1px solid var(--line);border-radius:4px;margin-top:8px}
-.pvwrap{background:#8a98a6;padding:10px;border-radius:6px;text-align:center}
-#prev{width:100%;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35);display:block;margin:0 auto}
-.prevph{padding:60px 10px;color:#fff}
-.mk{background:var(--red);color:#fff;border:2px solid #fff;border-radius:50%;width:22px;height:22px;line-height:18px;text-align:center;font-size:11px;font-weight:700}
-@media(min-width:960px){
-  body{padding-bottom:0}
-  .tabs{display:none}
-  main{display:grid;grid-template-columns:minmax(380px,470px) 1fr;gap:18px;align-items:start}
-  .view{display:block !important}
-  .prev{position:sticky;top:10px}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b27">
+  <title>Croquis Pro — Localização e terreno</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root{--ink:#172522;--muted:#60716c;--line:#dce5e1;--paper:#f3f6f4;--card:#fff;--green:#176b52;--green-dark:#10523f;--gold:#dda94c;--red:#b6403b;--shadow:0 10px 28px #19362b12}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+    .topbar{background:var(--ink);color:#fff;padding:17px max(20px,calc((100vw - 1440px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;gap:12px;align-items:center}.brandmark{width:39px;height:39px;border-radius:12px;background:var(--green);display:grid;place-items:center;font-size:21px}.brand h1{font-size:18px;margin:0;letter-spacing:.01em}.brand p{margin:2px 0 0;color:#b8c8c0;font-size:12px}.badge{color:#e9d39f;border:1px solid #ffffff36;border-radius:30px;padding:6px 11px;font-size:12px}
+    main{max-width:1440px;margin:auto;padding:22px;display:grid;grid-template-columns:minmax(350px,440px) minmax(0,1fr);gap:22px;align-items:start}.left{display:grid;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}.card h2{font-size:16px;margin:0 0 14px;display:flex;align-items:center;gap:9px}.step{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;color:var(--green);background:#e8f3ee;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}label{display:block;color:#465852;font-weight:650;font-size:12px}input,select{width:100%;margin-top:5px;border:1px solid #cbd7d1;border-radius:8px;padding:10px 11px;background:white;color:var(--ink);outline:none}input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px #176b5218}.help{font-size:11px;color:var(--muted);font-weight:400;margin:5px 0 0}.divider{height:1px;background:var(--line);margin:14px 0}.hint{border-radius:9px;background:#edf5f1;color:#34584a;padding:10px 12px;font-size:12px}.hint strong{color:var(--green-dark)}.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.btn{border:1px solid #cbd7d1;background:white;color:var(--ink);border-radius:8px;padding:10px 13px;font-weight:700}.btn:hover{border-color:var(--green);color:var(--green)}.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.primary:hover{background:var(--green-dark)}.btn.small{padding:8px 10px;font-size:12px}.status{min-height:20px;margin-top:9px;color:var(--muted);font-size:12px}.status.error{color:#9e2828}.status.success{color:var(--green)}
+    .workspace{position:sticky;top:16px;display:grid;gap:14px}.mapcard{padding:12px}.maphead{padding:3px 4px 11px;display:flex;justify-content:space-between;align-items:center;gap:12px}.maphead h2{font-size:15px;margin:0}.maphead span{font-size:11px;color:var(--muted)}#map{height:min(55vh,530px);min-height:330px;border-radius:10px;background:#e6eeea}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{border:1px solid var(--line);border-radius:10px;padding:12px}.metric span{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:18px;margin-top:2px}.metric small{font-size:11px;color:var(--muted)}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}th{background:#f3f7f5;color:#475a52;font-size:11px}td:first-child{font-weight:750;color:var(--green)}.note{font-size:11px;color:var(--muted);margin:10px 0 0}
+    .sheet{display:none;background:white;color:#111;padding:12mm;min-height:250mm}.sheethead{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid #333;padding:7mm;margin-bottom:5mm}.sheethead h2{margin:0;text-align:center;font-size:18px}.sheethead p{margin:3px 0 0;text-align:center;font-size:10px}.north{font-size:18px;font-weight:bold;border:1px solid;padding:7px}.sheetmap{height:112mm;border:1px solid #333}.sheetinfo{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #333;margin-top:5mm}.sheetinfo div{padding:4mm;border:1px solid #aaa;min-height:18mm}.sheetinfo strong{display:block;font-size:9px;color:#444;margin-bottom:2mm}.sheetinfo span{font-size:11px}.sheettable{margin-top:5mm}.sheetfoot{font-size:8px;margin-top:5mm;color:#444}.leaflet-control-attribution{font-size:9px!important}
+    @media(max-width:900px){main{grid-template-columns:1fr;padding:12px}.workspace{position:static}.topbar{padding:13px 16px}.badge{display:none}#map{height:48vh;min-height:300px}}
+    @media print{@page{size:A4 portrait;margin:8mm}body{background:white!important}.topbar,.left,.mapcard,.metrics,.vertexcard,.screen-only{display:none!important}main{display:block;padding:0;margin:0;max-width:none}.workspace{display:none}.sheet{display:block!important;padding:0;min-height:0}.sheetmap{height:105mm;break-inside:avoid}.sheethead{margin-bottom:4mm;padding:5mm}.sheetinfo{margin-top:4mm}.sheettable{margin-top:4mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
 </head>
 <body>
-<header class="top"><b>Croquis Pro</b><span>Croquis de localização para impressão A4</span></header>
-
-<nav class="tabs" id="tabs">
-  <button data-v="dados" class="on">1 Dados</button>
-  <button data-v="coords">2 Coordenadas</button>
-  <button data-v="folha">3 Folha</button>
-</nav>
-
-<main>
-<div class="form">
-
-<section class="view on" id="v-dados">
-  <h2>Dados do croquis</h2>
-  <div class="card">
-    <div class="grid">
-      <label class="full">Proprietário
-        <input id="proprietario" placeholder="Nome completo do proprietário"></label>
-      <label>Bairro
-        <input id="bairro" placeholder="ex.: Kikolo"></label>
-      <label>Município
-        <input id="municipio" placeholder="ex.: Cacuaco"></label>
-      <label>Província
-        <input id="provincia" value="Luanda"></label>
-      <label>Rua / referência
-        <input id="rua" placeholder="opcional"></label>
-      <label class="full">Fins
-        <input id="fins" list="finsList" value="Serviços administrativos">
-        <datalist id="finsList">
-          <option value="Serviços administrativos">
-          <option value="Legalização de terreno">
-          <option value="Contrato de energia (ENDE)">
-          <option value="Ligação de água (EPAL)">
-          <option value="Cadastro">
-          <option value="Licenciamento comercial">
-          <option value="Registo predial">
-        </datalist></label>
-      <label>Folha
-        <input id="folha" placeholder="ex.: 89-D-I-utm"></label>
-      <label>Especialidade
-        <input id="especialidade" value="Topografia"></label>
-      <label>Data
-        <input id="data" type="date"></label>
+  <header class="topbar"><div class="brand"><div class="brandmark" aria-hidden="true">⌖</div><div><h1>Croquis Pro</h1><p>Ferramenta profissional de localização e representação de terrenos</p></div></div><span class="badge">Projeto local · os dados ficam no seu dispositivo</span></header>
+  <main>
+    <div class="left">
+      <section class="card">
+        <h2><span class="step">1</span> Dados do processo</h2>
+        <div class="grid">
+          <label class="full">Proprietário / entidade<input id="owner" placeholder="Nome completo ou instituição"></label>
+          <label class="full">Representante<input id="responsible" placeholder="Responsável pelo terreno"></label>
+          <label>Bairro / localidade<input id="district" placeholder="Ex.: Mamã Gorda"></label>
+          <label>Município<input id="municipality" placeholder="Ex.: Viana"></label>
+          <label>Província<input id="province" value="Luanda"></label>
+          <label>Referência<input id="reference" placeholder="Perto de…"></label>
+          <label class="full">Finalidade<input id="purpose" value="Legalização do terreno"></label>
+          <label>Contacto<input id="phone" placeholder="Telefone"></label>
+          <label>Data<input id="date" type="date"></label>
+        </div>
+      </section>
+      <section class="card">
+        <h2><span class="step">2</span> Ponto de referência</h2>
+        <div class="grid">
+          <label>Latitude (decimal)<input id="lat" inputmode="decimal" value="-8.8750278" placeholder="-8.8750278"></label>
+          <label>Longitude (decimal)<input id="lon" inputmode="decimal" value="13.3389444" placeholder="13.3389444"></label>
+          <label class="full">Posição do ponto informado
+            <select id="anchor"><option value="center">Centro do terreno</option><option value="v1">Vértice V1 (canto de referência)</option></select>
+          </label>
+        </div>
+        <p class="help">Introduza as coordenadas confirmadas pelo proprietário/GPS. O mapa não altera o ponto ao arrastar.</p>
+        <div class="controls"><button class="btn small" id="pickPoint" type="button">Escolher ponto no mapa</button><button class="btn small" id="locate" type="button">Usar GPS</button><button class="btn small" id="maps" type="button">Abrir no Google Maps</button></div>
+        <div class="status" id="coordStatus" aria-live="polite"></div>
+      </section>
+      <section class="card">
+        <h2><span class="step">3</span> Dimensão e orientação</h2>
+        <div class="grid">
+          <label>Largura (m)<input id="width" type="number" min="0.1" step="0.1" value="19"></label>
+          <label>Comprimento (m)<input id="length" type="number" min="0.1" step="0.1" value="15"></label>
+          <label class="full">Azimute do lado da largura (graus)<input id="azimuth" type="number" min="0" max="359.99" step="0.1" value="90"></label>
+        </div>
+        <p class="help">Azimute contado a partir do Norte, no sentido horário. 90° orienta a largura Este–Oeste. O retângulo é uma representação baseada nas dimensões fornecidas.</p>
+        <div class="hint" style="margin-top:12px">As coordenadas dos vértices são calculadas em <strong>UTM/WGS84</strong> a partir do ponto e das dimensões. Confirme orientação e limites no local antes de usar em processos oficiais.</div>
+      </section>
+      <section class="card">
+        <h2><span class="step">4</span> Gerar e guardar</h2>
+        <div class="grid">
+          <label>Título do documento<input id="title" value="CROQUIS DE LOCALIZAÇÃO"></label>
+          <label>Especialidade<input id="specialty" value="Topografia"></label>
+        </div>
+        <div class="controls"><button class="btn primary" id="print" type="button">Imprimir / Guardar PDF</button><button class="btn" id="save" type="button">Guardar projeto</button><button class="btn" id="load" type="button">Abrir projeto</button><input id="file" type="file" accept="application/json,.json" hidden></div>
+        <div class="status" id="formStatus" aria-live="polite"></div>
+      </section>
     </div>
-  </div>
-
-  <div class="card">
-    <details open>
-      <summary>Técnico e empresa</summary>
-      <div class="grid" style="margin-top:8px">
-        <label class="full">Nome do técnico
-          <input id="tecnico"></label>
-        <label class="full">Empresa / nome comercial
-          <input id="empresa"></label>
-        <label class="full">Contactos
-          <input id="contacto" placeholder="ex.: 943 804 370 · lando4422@gmail.com"></label>
-        <label>Logótipo (opcional)
-          <input id="logo" type="file" accept="image/*"></label>
-        <label>Assinatura / carimbo (opcional)
-          <input id="sig" type="file" accept="image/*"></label>
+    <div class="workspace">
+      <section class="card mapcard"><div class="maphead"><h2>Pré-visualização do terreno</h2><span id="mapStatus">A carregar mapa…</span></div><div id="map" aria-label="Mapa de localização do terreno"></div><p class="note">Cartografia © Esri e respetivos fornecedores. A disponibilidade e resolução das imagens dependem da zona e da ligação à internet.</p></section>
+      <section class="card metrics"><div class="metric"><span>Área estimada</span><strong id="area">285 m²</strong><small>largura × comprimento</small></div><div class="metric"><span>Perímetro estimado</span><strong id="perimeter">68 m</strong><small>2 × (largura + comprimento)</small></div><div class="metric"><span>Zona UTM</span><strong id="utmZone">33S</strong><small>WGS84</small></div></section>
+      <section class="card vertexcard"><h2 style="margin:0 0 12px;font-size:15px">Tabela de vértices</h2><div class="tablewrap"><table><thead><tr><th>Vértice</th><th>Este (m)</th><th>Norte (m)</th><th>Latitude</th><th>Longitude</th></tr></thead><tbody id="vertices"></tbody></table></div><p class="note">Coordenadas calculadas a partir de um retângulo ideal; não substituem levantamento topográfico dos limites.</p></section>
+    </div>
+    <section class="sheet" id="sheet">
+      <div class="sheethead"><div></div><div><h2 id="printTitle">CROQUIS DE LOCALIZAÇÃO</h2><p>Datum WGS84 · Projeção UTM · Coordenadas em metros</p></div><div class="north">↑ N</div></div>
+      <div id="printMap" class="sheetmap"></div>
+      <div class="sheetinfo">
+        <div><strong>PROPRIETÁRIO / ENTIDADE</strong><span id="sOwner">—</span></div><div><strong>REPRESENTANTE</strong><span id="sResponsible">—</span></div><div><strong>FINALIDADE</strong><span id="sPurpose">—</span></div>
+        <div><strong>LOCALIDADE</strong><span id="sLocation">—</span></div><div><strong>COORDENADAS DE REFERÊNCIA</strong><span id="sCoords">—</span></div><div><strong>DIMENSÃO · ÁREA · PERÍMETRO</strong><span id="sSize">—</span></div>
+        <div><strong>ESPECIALIDADE</strong><span id="sSpecialty">—</span></div><div><strong>CONTACTO</strong><span id="sPhone">—</span></div><div><strong>DATA</strong><span id="sDate">—</span></div>
       </div>
-    </details>
-    <details>
-      <summary>Opções avançadas</summary>
-      <div class="grid" style="margin-top:8px">
-        <label class="full">Título da folha
-          <input id="titulo" value="CROQUIS DE LOCALIZAÇÃO"></label>
-        <label>Estilo do mapa de cima
-          <select id="estiloTopo">
-            <option value="orange">Laranja (planta)</option>
-            <option value="street">Ruas a cores</option>
-            <option value="sat">Satélite</option>
-          </select></label>
-        <label>Zoom máximo da imagem
-          <select id="zoomMax">
-            <option value="17">17</option>
-            <option value="18" selected>18</option>
-            <option value="19">19 (pode faltar)</option>
-          </select></label>
-        <label>Escala do satélite
-          <select id="escalaSat">
-            <option value="auto">Automática</option>
-            <option>500</option><option>1000</option><option>2000</option><option>2500</option><option>5000</option>
-          </select></label>
-        <label>Escala do mapa de cima
-          <select id="escalaTopo">
-            <option value="auto">Automática</option>
-            <option>5000</option><option>10000</option><option>25000</option><option>50000</option>
-          </select></label>
-        <label>Raio do círculo (m)
-          <input id="raio" type="number" min="10" placeholder="automático"></label>
-        <label>Qualidade de exportação
-          <select id="dpi">
-            <option value="200">200 dpi (leve)</option>
-            <option value="300" selected>300 dpi (impressão)</option>
-            <option value="400">400 dpi (pesado)</option>
-          </select></label>
-        <label>Área (se quiser escrever à mão)
-          <input id="areaManual" placeholder="ex.: 161 m²"></label>
-        <label>Perímetro (idem)
-          <input id="perimManual" placeholder="ex.: 50.7 m"></label>
-        <label class="full">Endereço próprio das imagens (opcional)
-          <input id="tileUrl" placeholder="https://.../{z}/{x}/{y}.jpg"></label>
-      </div>
-      <p class="hint">Área e perímetro são calculados a partir dos vértices. Só preencha se tiver valores oficiais.</p>
-    </details>
-  </div>
-</section>
-
-<section class="view" id="v-coords">
-  <h2>Coordenadas do terreno</h2>
-  <div class="card">
-    <div class="grid">
-      <label>Tipo de coordenadas
-        <select id="mode">
-          <option value="dec">Graus decimais (lat, lon)</option>
-          <option value="utm">UTM (Este, Norte)</option>
-        </select></label>
-      <label>Hemisfério
-        <select id="hemi"><option value="S">Sul</option><option value="N">Norte</option></select></label>
-      <label>Zona UTM
-        <input id="zone" type="number" min="1" max="60" value="33"></label>
-    </div>
-    <label style="margin-top:10px">Vértices, um por linha
-      <textarea id="pts" spellcheck="false" placeholder="-8.79050, 13.37700&#10;-8.79050, 13.37712&#10;-8.79062, 13.37712&#10;-8.79062, 13.37700"></textarea></label>
-    <p class="hint">Cole as coordenadas do Google Maps, Google Earth ou do GPS. Aceita graus decimais, graus-minutos-segundos e UTM. Use ponto nos decimais. Com 3 ou mais vértices o terreno é desenhado e a área calculada.</p>
-    <div id="msg"></div>
-    <div class="btns">
-      <button class="b" id="bGps">Usar o meu GPS</button>
-      <button class="b" id="bUndo">Apagar último</button>
-      <button class="b" id="bEx">Exemplo</button>
-      <button class="b" id="bClr">Limpar</button>
-    </div>
-  </div>
-  <div class="card">
-    <label>Procurar local no mapa
-      <input id="search" placeholder="ex.: Kikolo, Cacuaco"></label>
-    <div class="btns"><button class="b" id="bSearch">Procurar</button></div>
-    <div id="pick"></div>
-    <p class="hint">Toque no mapa para marcar cada canto do terreno, pela ordem. Cada toque acrescenta uma linha na lista de vértices.</p>
-  </div>
-</section>
-
-</div>
-
-<aside class="prev">
-<section class="view" id="v-folha">
-  <h2>Folha final</h2>
-  <div class="btns" style="margin:0 0 10px">
-    <button class="b p" id="bPdf">Baixar PDF A4</button>
-    <button class="b" id="bPng">Baixar PNG</button>
-    <button class="b" id="bRef">Atualizar</button>
-  </div>
-  <div class="btns" style="margin:0 0 10px">
-    <button class="b" id="bSave">Guardar projeto</button>
-    <button class="b" id="bOpen">Abrir projeto</button>
-    <input type="file" id="fOpen" accept=".json,application/json" style="display:none">
-  </div>
-  <div id="state" class="hint"></div>
-  <div class="pvwrap" style="margin-top:8px">
-    <div class="prevph" id="ph">Preencha as coordenadas para ver a folha.</div>
-    <canvas id="prev" style="display:none"></canvas>
-  </div>
-  <p class="hint">Imagem de satélite e mapa vêm da Esri. A nitidez do terreno depende da imagem disponível para a zona; a folha é exportada em A4 na qualidade escolhida.</p>
-</section>
-</aside>
-</main>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script>
-(()=>{
-'use strict';
-const $=id=>document.getElementById(id);
-const FONT='Roboto,"Helvetica Neue",Arial,sans-serif';
-const RED='#a3262f';
-const SAT_URL='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-const STR_URL='https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
-let K=1;                     // pixels por mm do render em curso
-const pt=p=>p*K*25.4/72;     // pontos tipográficos -> px
-const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
-
-/* ---------- Geodesia: WGS84 <-> UTM ---------- */
-const A_=6378137,F_=1/298.257223563,E2=F_*(2-F_),EP2=E2/(1-E2),K0=0.9996;
-function merid(p){return A_*((1-E2/4-3*E2*E2/64-5*E2**3/256)*p-(3*E2/8+3*E2*E2/32+45*E2**3/1024)*Math.sin(2*p)+(15*E2*E2/256+45*E2**3/1024)*Math.sin(4*p)-(35*E2**3/3072)*Math.sin(6*p));}
-function toUTM(lat,lon,zone){
-  const p=rad(lat),l=rad(lon),l0=rad(zone*6-183);
-  const s=Math.sin(p),c=Math.cos(p),t=Math.tan(p);
-  const N=A_/Math.sqrt(1-E2*s*s),T=t*t,C=EP2*c*c,A=c*(l-l0),M=merid(p);
-  const e=K0*N*(A+(1-T+C)*A**3/6+(5-18*T+T*T+72*C-58*EP2)*A**5/120)+500000;
-  let n=K0*(M+N*t*(A*A/2+(5-T+9*C+4*C*C)*A**4/24+(61-58*T+T*T+600*C-330*EP2)*A**6/720));
-  if(lat<0)n+=1e7;
-  return {e,n};
-}
-function fromUTM(e,n,zone,south){
-  const x=e-500000,y=south?n-1e7:n,M=y/K0;
-  const mu=M/(A_*(1-E2/4-3*E2*E2/64-5*E2**3/256));
-  const e1=(1-Math.sqrt(1-E2))/(1+Math.sqrt(1-E2));
-  const p1=mu+(3*e1/2-27*e1**3/32)*Math.sin(2*mu)+(21*e1*e1/16-55*e1**4/32)*Math.sin(4*mu)+(151*e1**3/96)*Math.sin(6*mu)+(1097*e1**4/512)*Math.sin(8*mu);
-  const s=Math.sin(p1),c=Math.cos(p1),t=Math.tan(p1);
-  const N1=A_/Math.sqrt(1-E2*s*s),T1=t*t,C1=EP2*c*c,R1=A_*(1-E2)/Math.pow(1-E2*s*s,1.5),D=x/(N1*K0);
-  const lat=p1-(N1*t/R1)*(D*D/2-(5+3*T1+10*C1-4*C1*C1-9*EP2)*D**4/24+(61+90*T1+298*C1+45*T1*T1-252*EP2-3*C1*C1)*D**6/720);
-  const lon=rad(zone*6-183)+(D-(1+2*T1+C1)*D**3/6+(5-2*C1+28*T1-3*C1*C1+8*EP2+24*T1*T1)*D**5/120)/c;
-  return {lat:deg(lat),lon:deg(lon)};
-}
-const zoneFromLon=lon=>Math.floor((lon+180)/6)+1;
-const ll2w=(lat,lon,ws)=>{const s=Math.sin(rad(lat));return {x:(lon+180)/360*ws,y:(0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*ws};};
-const w2ll=(x,y,ws)=>{const n=Math.PI-2*Math.PI*y/ws;return {lon:x/ws*360-180,lat:deg(Math.atan(0.5*(Math.exp(n)-Math.exp(-n))))};};
-
-/* ---------- Leitura e interpretação dos dados ---------- */
-let logoImg=null,logoData='',sigImg=null,sigData='';
-const g=id=>$(id).value.trim();
-
-function parseDMS(line){
-  const re=/(\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*['′’]\s*)?(?:(\d+(?:\.\d+)?)\s*["″”]\s*)?([NSEWnsew])?/g;
-  const out=[];let m;
-  while((m=re.exec(line))){
-    let v=parseFloat(m[1])+(m[2]?parseFloat(m[2])/60:0)+(m[3]?parseFloat(m[3])/3600:0);
-    const h=(m[4]||'').toUpperCase();
-    if(h==='S'||h==='W')v=-v;
-    out.push({v,h});
-  }
-  return out.length>=2?out:null;
-}
-
-function buildData(){
-  const D={pts:[],notes:[],error:''};
-  const mode=g('mode'),south=g('hemi')==='S';
-  let zone=parseInt(g('zone'))||33;
-  const txt=$('pts').value.replace(/[−–—]/g,'-');
-  const raw=[];
-  txt.split(/\n/).forEach(line=>{
-    if(!line.trim())return;
-    const d=parseDMS(line);
-    if(d){
-      let lat=d[0].v,lon=d[1].v;
-      if(/[EW]/.test(d[0].h)||/[NS]/.test(d[1].h)){const t=lat;lat=lon;lon=t;}
-      raw.push({kind:'ll',lat:south&&lat>0&&!/N/.test(d[0].h+d[1].h)?-lat:lat,lon});
-      return;
-    }
-    let nums=line.match(/-?\d+(?:\.\d+)?/g);
-    if(!nums||nums.length<2)return;
-    if(nums.length>2&&/^\s*[A-Za-z]/.test(line))nums=nums.slice(1);
-    raw.push({kind:mode,a:parseFloat(nums[0]),b:parseFloat(nums[1])});
-  });
-  if(!raw.length){D.error='Escreva pelo menos um ponto (um por linha).';return D;}
-  // zona automática em graus decimais
-  if(mode==='dec'){
-    const f=raw[0];
-    const lon0=f.kind==='ll'?f.lon:(f.a>0&&f.b<0&&f.a>=11?f.a:f.b);
-    zone=zoneFromLon(lon0);$('zone').value=zone;
-  }
-  for(const r of raw){
-    let lat,lon,e,n;
-    if(r.kind==='ll'){lat=r.lat;lon=r.lon;}
-    else if(r.kind==='dec'){
-      let a=r.a,b=r.b;
-      if(a>0&&b<0&&a>=11){const t=a;a=b;b=t;D.notes.push('Ordem lon/lat detetada e corrigida.');}
-      lat=south?-Math.abs(a):a;lon=b;
-    }else{
-      let a=r.a,b=r.b;
-      if(a>1e6&&b<1e6){const t=a;a=b;b=t;D.notes.push('Ordem Norte/Este detetada e corrigida.');}
-      e=a;n=b;
-      if(e<100000||e>900000||n<0||n>1e7+1e6){D.error='Coordenadas UTM fora do intervalo normal. Confirme o Este (6 dígitos) e o Norte (7 dígitos).';return D;}
-      const ll=fromUTM(e,n,zone,south);lat=ll.lat;lon=ll.lon;
-    }
-    if(Math.abs(lat)>90||Math.abs(lon)>180){D.error='Latitude/longitude inválidas. Confirme os valores.';return D;}
-    if(e===undefined){const u=toUTM(lat,lon,zone);e=u.e;n=u.n;}
-    D.pts.push({lat,lon,e,n});
-  }
-  D.zone=zone;D.south=D.pts[0].lat<0;
-  const es=D.pts.map(p=>p.e),ns=D.pts.map(p=>p.n);
-  D.bbox={e0:Math.min(...es),e1:Math.max(...es),n0:Math.min(...ns),n1:Math.max(...ns)};
-  D.bw=Math.max(D.bbox.e1-D.bbox.e0,1);D.bh=Math.max(D.bbox.n1-D.bbox.n0,1);
-  const ce=(D.bbox.e0+D.bbox.e1)/2,cn=(D.bbox.n0+D.bbox.n1)/2;
-  const cl=fromUTM(ce,cn,zone,D.south);D.center={lat:cl.lat,lon:cl.lon,e:ce,n:cn};
-  const P=D.pts,N=P.length;
-  if(N>=3){
-    let a=0;for(let i=0;i<N;i++){const j=(i+1)%N;a+=P[i].e*P[j].n-P[j].e*P[i].n;}
-    D.area=Math.abs(a)/2;
-  }
-  let per=0;
-  if(N>=2){for(let i=0;i<N;i++){const j=(i+1)%N;if(N===2&&i===1)break;per+=Math.hypot(P[j].e-P[i].e,P[j].n-P[i].n);}D.perim=per;}
-  // textos
-  D.f={
-    titulo:g('titulo')||'CROQUIS DE LOCALIZAÇÃO',
-    proprietario:g('proprietario'),rua:g('rua'),bairro:g('bairro'),municipio:g('municipio'),provincia:g('provincia'),
-    folha:g('folha'),especialidade:g('especialidade'),fins:g('fins'),
-    data:g('data'),tecnico:g('tecnico'),empresa:g('empresa'),contacto:g('contacto'),
-    areaManual:g('areaManual'),perimManual:g('perimManual')
-  };
-  return D;
-}
-
-/* ---------- Pedidos de imagem (tiles) ---------- */
-const cache=new Map();
-function loadImg(url){
-  if(cache.has(url))return cache.get(url);
-  if(cache.size>700)cache.clear();
-  const p=new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=()=>res(null);i.src=url;});
-  cache.set(url,p);return p;
-}
-
-/* ---------- Desenho: utilitários ---------- */
-function wrapLines(ctx,text,maxW){
-  const out=[];
-  String(text).split('\n').forEach(par=>{
-    const words=par.split(/\s+/).filter(Boolean);
-    if(!words.length){out.push('');return;}
-    let cur='';
-    for(let w of words){
-      while(ctx.measureText(w).width>maxW&&w.length>1){
-        let i=w.length-1;while(i>1&&ctx.measureText(w.slice(0,i)).width>maxW)i--;
-        if(cur){out.push(cur);cur='';}
-        out.push(w.slice(0,i));w=w.slice(i);
-      }
-      const t=cur?cur+' '+w:w;
-      if(ctx.measureText(t).width<=maxW)cur=t;else{if(cur)out.push(cur);cur=w;}
-    }
-    if(cur)out.push(cur);
-  });
-  return out;
-}
-function fit(ctx,text,w,h,maxPt,minPt,weight){
-  let r;
-  for(let p=maxPt;p>=minPt-0.01;p-=0.4){
-    const fs=pt(p);ctx.font=`${weight} ${fs}px ${FONT}`;
-    const lines=wrapLines(ctx,text,w);const lh=fs*1.22;
-    r={lines,fs,lh};if(lines.length*lh<=h)break;
-  }
-  return r;
-}
-function textBlock(ctx,text,area,maxPt,minPt,weight,color){
-  const r=fit(ctx,text,area.w*K,area.h*K,maxPt,minPt,weight);
-  ctx.font=`${weight} ${r.fs}px ${FONT}`;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  const total=r.lines.length*r.lh;
-  let y=area.y*K+(area.h*K-total)/2+r.lh*0.5+r.fs*0.34;
-  r.lines.forEach(l=>{ctx.fillText(l,(area.x+area.w/2)*K,y);y+=r.lh;});
-}
-function box(ctx,r,lw){ctx.lineWidth=(lw||0.3)*K;ctx.strokeStyle='#000';ctx.strokeRect(r.x*K,r.y*K,r.w*K,r.h*K);}
-function lab(ctx,r,text){ctx.font=`bold ${pt(5.6)}px ${FONT}`;ctx.fillStyle=RED;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(text,(r.x+1.3)*K,(r.y+2.8)*K);}
-function field(ctx,r,label,value,o){
-  o=o||{};box(ctx,r);lab(ctx,r,label);
-  const a={x:r.x+1.5,y:r.y+3.6,w:r.w-3,h:r.h-4.4};
-  textBlock(ctx,value||'—',a,o.max||9,o.min||5,o.weight||'bold',o.color||'#000');
-}
-function contain(ctx,img,r){
-  const s=Math.min(r.w*K/img.width,r.h*K/img.height);const w=img.width*s,h=img.height*s;
-  ctx.drawImage(img,r.x*K+(r.w*K-w)/2,r.y*K+(r.h*K-h)/2,w,h);
-}
-function halo(ctx,txt,x,y,sizePt,col,align,weight){
-  ctx.font=`${weight||'bold'} ${pt(sizePt)}px ${FONT}`;ctx.textAlign=align||'center';ctx.textBaseline='alphabetic';
-  ctx.lineJoin='round';ctx.lineWidth=0.7*K;ctx.strokeStyle='rgba(255,255,255,.92)';ctx.strokeText(txt,x,y);
-  ctx.fillStyle=col;ctx.fillText(txt,x,y);
-}
-function pin(ctx,x,y,hmm,color){
-  const h=hmm*K,r=h*0.32,cy=y-h+r;
-  ctx.beginPath();ctx.moveTo(x,y);
-  ctx.bezierCurveTo(x-r*0.9,y-h*0.38,x-r,cy+r*0.5,x-r,cy);
-  ctx.arc(x,cy,r,Math.PI,0,false);
-  ctx.bezierCurveTo(x+r,cy+r*0.5,x+r*0.9,y-h*0.38,x,y);ctx.closePath();
-  ctx.fillStyle=color;ctx.fill();ctx.lineWidth=0.25*K;ctx.strokeStyle='#fff';ctx.stroke();
-  ctx.beginPath();ctx.arc(x,cy,r*0.42,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
-}
-function tag(ctx,r,text){
-  ctx.font=`bold ${pt(6)}px ${FONT}`;const w=ctx.measureText(text).width+2.8*K,h=4.2*K;
-  ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillRect(r.x+1*K,r.y+1*K,w,h);
-  ctx.lineWidth=0.2*K;ctx.strokeStyle='#222';ctx.strokeRect(r.x+1*K,r.y+1*K,w,h);
-  ctx.fillStyle='#111';ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(text,r.x+2.4*K,r.y+1*K+2.95*K);
-}
-
-/* ---------- Painel de mapa ---------- */
-async function prepPanel(spec,opts){
-  const r={x:spec.rect.x*K,y:spec.rect.y*K,w:spec.rect.w*K,h:spec.rect.h*K};
-  const mpp=(spec.den/1000)/K;
-  const zf=Math.log2(156543.03392*Math.cos(rad(spec.center.lat))/mpp);
-  const tz=Math.max(0,Math.min(opts.zoomMax,Math.ceil(zf-1e-6)));
-  const s=Math.pow(2,zf-tz),ws=256*Math.pow(2,zf),ts=256*s,nT=Math.pow(2,tz);
-  const c=ll2w(spec.center.lat,spec.center.lon,ws);
-  const base=spec.kind==='sat'?(opts.tileUrl||SAT_URL):STR_URL;
-  const x0=Math.floor((c.x-r.w/2)/ts),x1=Math.floor((c.x+r.w/2)/ts);
-  const y0=Math.max(0,Math.floor((c.y-r.h/2)/ts)),y1=Math.min(nT-1,Math.floor((c.y+r.h/2)/ts));
-  const jobs=[];
-  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){
-    const xx=((tx%nT)+nT)%nT;
-    const url=base.replace('{z}',tz).replace('{x}',xx).replace('{y}',ty);
-    jobs.push(loadImg(url).then(img=>({img,tx,ty})));
-  }
-  const tiles=await Promise.all(jobs);
-  const loaded=tiles.filter(t=>t.img).length;
-  const proj=(lat,lon)=>{const w=ll2w(lat,lon,ws);return {x:r.x+r.w/2+(w.x-c.x),y:r.y+r.h/2+(w.y-c.y)};};
-  const unproj=(px,py)=>w2ll(c.x+(px-r.x-r.w/2),c.y+(py-r.y-r.h/2),ws);
-  const P={r,proj,unproj,mpp,
-    projUTM:(e,n)=>{const l=fromUTM(e,n,spec.zone,spec.south);return proj(l.lat,l.lon);}};
-  return {
-    loaded,total:tiles.length,
-    draw(ctx){
-      ctx.save();ctx.beginPath();ctx.rect(r.x,r.y,r.w,r.h);ctx.clip();
-      ctx.fillStyle=spec.kind==='sat'?'#2b3138':'#e6e6e6';ctx.fillRect(r.x,r.y,r.w,r.h);
-      tiles.forEach(t=>{
-        if(!t.img)return;
-        ctx.drawImage(t.img,r.x+r.w/2+(t.tx*ts-c.x),r.y+r.h/2+(t.ty*ts-c.y),ts+0.7,ts+0.7);
-      });
-      if(spec.kind==='orange'){ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb(247,150,32)';ctx.fillRect(r.x,r.y,r.w,r.h);ctx.globalCompositeOperation='source-over';}
-      if(!loaded){
-        ctx.fillStyle='#fff';ctx.font=`bold ${pt(9)}px ${FONT}`;ctx.textAlign='center';
-        ctx.fillText('Sem imagem. Verifique a ligação à internet.',r.x+r.w/2,r.y+r.h/2);
-      }
-      if(spec.grid)drawGrid(ctx,P,spec);
-      if(spec.overlay)spec.overlay(ctx,P);
-      if(spec.scaleBar)scaleBar(ctx,P);
-      if(spec.tagText)tag(ctx,r,spec.tagText);
-      if(spec.kind==='sat'&&!opts.tileUrl){
-        halo(ctx,'Imagem © Esri, Maxar, Earthstar Geographics',r.x+r.w-1.2*K,r.y+r.h-1*K,4.4,'#222','right','normal');
-      }
-      ctx.restore();
-      ctx.lineWidth=0.35*K;ctx.strokeStyle='#000';ctx.strokeRect(r.x,r.y,r.w,r.h);
-    }
-  };
-}
-
-function drawGrid(ctx,P,spec){
-  const r=P.r;
-  const cs=[P.unproj(r.x,r.y),P.unproj(r.x+r.w,r.y),P.unproj(r.x,r.y+r.h),P.unproj(r.x+r.w,r.y+r.h)].map(l=>toUTM(l.lat,l.lon,spec.zone));
-  const e0=Math.min(...cs.map(c=>c.e)),e1=Math.max(...cs.map(c=>c.e)),n0=Math.min(...cs.map(c=>c.n)),n1=Math.max(...cs.map(c=>c.n));
-  const span=Math.max(e1-e0,n1-n0);
-  const step=[10,20,25,50,100,200,250,500,1000,2000,2500,5000,10000,20000].find(s=>span/s<=6)||50000;
-  const lineCol=spec.kind==='sat'?'rgba(255,255,255,.55)':'rgba(30,30,30,.55)';
-  ctx.lineWidth=0.18*K;ctx.strokeStyle=lineCol;
-  const labels=[];
-  for(let E=Math.ceil(e0/step)*step;E<=e1;E+=step){
-    const a=P.projUTM(E,n1+step),b=P.projUTM(E,n0-step);
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-    const yEdge=r.y+r.h,t=(yEdge-a.y)/(b.y-a.y),x=a.x+t*(b.x-a.x);
-    labels.push(()=>halo(ctx,String(Math.round(E)),x,r.y+r.h-1.6*K,5.6,'#111','center'));
-  }
-  for(let N=Math.ceil(n0/step)*step;N<=n1;N+=step){
-    const a=P.projUTM(e0-step,N),b=P.projUTM(e1+step,N);
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-    const xEdge=r.x,t=(xEdge-a.x)/(b.x-a.x),y=a.y+t*(b.y-a.y);
-    labels.push(()=>{ctx.save();ctx.translate(r.x+2.9*K,y);ctx.rotate(-Math.PI/2);halo(ctx,String(Math.round(N)),0,0,5.6,'#111','center');ctx.restore();});
-  }
-  labels.forEach(f=>f());
-}
-
-function scaleBar(ctx,P){
-  const r=P.r;
-  const list=[5,10,20,25,50,100,200,250,500,1000,2000,5000];
-  let L=list[0];for(const v of list){if(v/P.mpp<=r.w*0.28)L=v;}
-  const wpx=L/P.mpp,bh=1.3*K,pad=3*K;
-  const bw=wpx+pad*2+4*K,bx=r.x+r.w-bw-1.5*K,by=r.y+r.h-9.5*K;
-  ctx.fillStyle='rgba(255,255,255,.93)';ctx.fillRect(bx,by,bw,8*K);
-  ctx.lineWidth=0.2*K;ctx.strokeStyle='#222';ctx.strokeRect(bx,by,bw,8*K);
-  const x0=bx+pad+1*K,y0=by+3.2*K;
-  for(let i=0;i<4;i++){ctx.fillStyle=i%2?'#fff':'#000';ctx.fillRect(x0+wpx/4*i,y0,wpx/4,bh);}
-  ctx.lineWidth=0.18*K;ctx.strokeStyle='#000';ctx.strokeRect(x0,y0,wpx,bh);
-  ctx.fillStyle='#000';ctx.font=`bold ${pt(5.2)}px ${FONT}`;ctx.textBaseline='alphabetic';
-  ctx.textAlign='center';ctx.fillText('0',x0,by+2.6*K);ctx.fillText(L+' m',x0+wpx,by+2.6*K);
-  ctx.font=`${pt(4.8)}px ${FONT}`;ctx.fillText('Escala gráfica',x0+wpx/2,by+7*K);
-}
-
-/* ---------- Layout (mm) ---------- */
-const RH=4.2;
-function tableInfo(n){
-  if(!n)return {groups:0,rows:0,h:0};
-  const groups=n<=6?1:(n<=16?2:3),rows=Math.ceil(n/groups);
-  return {groups,rows,h:(rows+1)*RH};
-}
-const NICE=(list,min,fw,fh,bw,bh,m)=>{for(const s of list){if(s<min)continue;if(bw*m<=fw*s/1000&&bh*m<=fh*s/1000)return s;}return list[list.length-1];};
-
-/* ---------- Render da folha ---------- */
-let lock=Promise.resolve();
-function renderSheet(dpi){
-  const run=lock.then(()=>doRender(dpi));
-  lock=run.catch(()=>{});
-  return run;
-}
-async function doRender(dpi){
-  K=dpi/25.4;
-  const D=buildData();if(D.error)throw new Error(D.error);
-  const opts={zoomMax:parseInt(g('zoomMax'))||18,tileUrl:g('tileUrl')};
-  const cv=document.createElement('canvas');cv.width=Math.round(210*K);cv.height=Math.round(297*K);
-  const ctx=cv.getContext('2d');
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
-
-  // geometria
-  const X=11,W=188;
-  const tb=tableInfo(D.pts.length);
-  const top=32+tb.h+2,bTop=226,avail=bTop-2-top;
-  const hA=Math.round(avail*0.38),hB=avail-hA-2;
-  const rA={x:X,y:top,w:W,h:hA},rB={x:X,y:top+hA+2,w:W,h:hB};
-  const rI={x:X,y:bTop+5,w:60,h:41};
-
-  // escalas
-  const sSat=g('escalaSat'),sTop=g('escalaTopo');
-  const denB=sSat!=='auto'?parseInt(sSat):NICE([500,1000,2000,2500,5000,10000],1000,rB.w,rB.h,D.bw,D.bh,1.7);
-  let denI=NICE([250,500,1000,2000,2500,5000],250,rI.w,rI.h,D.bw,D.bh,2.2);
-  denI=Math.min(denI,Math.max(250,denB/2));
-  const denA=sTop!=='auto'?parseInt(sTop):([2500,5000,10000,25000,50000,100000].find(s=>s>=denB*8)||100000);
-  const raio=parseFloat(g('raio'))||Math.round(denA*0.188*0.08/10)*10;
-  const base={center:D.center,zone:D.zone,south:D.south};
-  const estilo=g('estiloTopo')||'orange';
-
-  const polyOverlay=(labels,pinH)=>(c,P)=>{
-    const pts=D.pts;
-    if(pts.length>=2){
-      c.beginPath();pts.forEach((p,i)=>{const q=P.proj(p.lat,p.lon);i?c.lineTo(q.x,q.y):c.moveTo(q.x,q.y);});
-      if(pts.length>=3){c.closePath();c.fillStyle='rgba(255,50,50,.2)';c.fill();}
-      c.lineWidth=0.5*K;c.strokeStyle='#ff3030';c.lineJoin='round';c.stroke();
-    }
-    if(pts.length>=2||labels){
-      pts.forEach((p,i)=>{
-        const q=P.proj(p.lat,p.lon);
-        c.beginPath();c.arc(q.x,q.y,0.8*K,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.lineWidth=0.3*K;c.strokeStyle='#d01818';c.stroke();
-        if(labels)halo(c,pts.length===1?'P1':'V'+(i+1),q.x+1.6*K,q.y-1.4*K,6.2,'#7a0c0c','left');
-      });
-    }
-    const q=P.proj(D.center.lat,D.center.lon);pin(c,q.x,q.y,pinH,'#d62828');
-  };
-  const bigPoly=D.bw/(rB.w*denB/1000)>0.1||D.bh/(rB.h*denB/1000)>0.1;
-
-  const specs=[
-    {...base,rect:rA,den:denA,kind:estilo,grid:true,tagText:'PLANTA DE SITUAÇÃO  1:'+denA,
-      overlay:(c,P)=>{
-        const q=P.proj(D.center.lat,D.center.lon),R=raio/P.mpp;
-        c.lineWidth=0.3*K;c.strokeStyle='#b3202e';
-        c.beginPath();c.arc(q.x,q.y,R,0,Math.PI*2);c.stroke();
-        c.beginPath();c.arc(q.x,q.y,R*0.5,0,Math.PI*2);c.setLineDash([1.2*K,1*K]);c.stroke();c.setLineDash([]);
-        c.lineWidth=0.18*K;c.beginPath();
-        for(let a=0;a<8;a++){const t=a*Math.PI/4;c.moveTo(q.x,q.y);c.lineTo(q.x+Math.cos(t)*R,q.y+Math.sin(t)*R);}
-        c.stroke();
-        if(D.pts.length>=3){c.beginPath();D.pts.forEach((p,i)=>{const z=P.proj(p.lat,p.lon);i?c.lineTo(z.x,z.y):c.moveTo(z.x,z.y);});c.closePath();c.fillStyle='rgba(180,20,30,.55)';c.fill();}
-        pin(c,q.x,q.y,8,'#d62828');
-      }},
-    {...base,rect:rB,den:denB,kind:'sat',grid:true,scaleBar:true,tagText:'IMAGEM DE SATÉLITE  1:'+denB,overlay:polyOverlay(bigPoly,7)},
-    {...base,rect:rI,den:denI,kind:'sat',grid:false,overlay:polyOverlay(true,5.5)}
-  ];
-  const prep=await Promise.all(specs.map(s=>prepPanel(s,opts)));
-
-  /* moldura */
-  ctx.lineWidth=0.9*K;ctx.strokeStyle='#000';ctx.strokeRect(8*K,8*K,194*K,281*K);
-  ctx.lineWidth=0.25*K;ctx.strokeRect(9.4*K,9.4*K,191.2*K,278.2*K);
-
-  /* cabeçalho */
-  const hdr={x:X,y:11,w:W,h:20};
-  box(ctx,hdr);
-  const hl={x:X,y:11,w:50,h:20},hc={x:X+50,y:11,w:108,h:20},hr={x:X+158,y:11,w:30,h:20};
-  box(ctx,hl);box(ctx,hr);
-  if(logoImg)contain(ctx,logoImg,{x:hl.x+1.5,y:hl.y+1.5,w:hl.w-3,h:hl.h-3});
-  else{
-    const nm=D.f.empresa||D.f.tecnico;
-    if(nm)textBlock(ctx,(nm+(D.f.contacto?'\n'+D.f.contacto:'')),{x:hl.x+1.5,y:hl.y+1.5,w:hl.w-3,h:hl.h-3},8,4.6,'bold','#111');
-  }
-  textBlock(ctx,D.f.titulo.toUpperCase(),{x:hc.x+2,y:hc.y+1.5,w:hc.w-4,h:11},17,9,'bold','#000');
-  ctx.font=`${pt(6.4)}px ${FONT}`;ctx.fillStyle='#333';ctx.textAlign='center';
-  ctx.fillText(`Datum WGS 84  ·  Projeção UTM, zona ${D.zone}${D.south?'S':'N'}  ·  Coordenadas em metros`,(hc.x+hc.w/2)*K,(hc.y+16.6)*K);
-  // seta Norte
-  {
-    const cx=(hr.x+hr.w/2)*K,cy=(hr.y+11.5)*K,h=11*K;
-    ctx.beginPath();ctx.moveTo(cx,cy-h/2);ctx.lineTo(cx-3.2*K,cy+h/2-1*K);ctx.lineTo(cx,cy+h/2-3.5*K);ctx.closePath();ctx.fillStyle='#000';ctx.fill();
-    ctx.beginPath();ctx.moveTo(cx,cy-h/2);ctx.lineTo(cx+3.2*K,cy+h/2-1*K);ctx.lineTo(cx,cy+h/2-3.5*K);ctx.closePath();ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=0.25*K;ctx.strokeStyle='#000';ctx.stroke();
-    ctx.fillStyle='#000';ctx.font=`bold ${pt(9)}px ${FONT}`;ctx.textAlign='center';ctx.fillText('N',cx,(hr.y+3.6)*K+0);
-  }
-
-  /* tabela de vértices */
-  if(tb.groups){
-    const gw=W/tb.groups;
-    const cols=tb.groups===1?[['Vértice',0.12],['Este (m)',0.2],['Norte (m)',0.22],['Latitude',0.23],['Longitude',0.23]]:[['Vértice',0.2],['Este (m)',0.4],['Norte (m)',0.4]];
-    for(let gI=0;gI<tb.groups;gI++){
-      const gx=X+gI*gw;let cx=gx;
-      ctx.fillStyle='#e6ebf0';ctx.fillRect(gx*K,32*K,gw*K,RH*K);
-      cols.forEach(([name,f])=>{
-        const w=gw*f;
-        ctx.fillStyle=RED;ctx.font=`bold ${pt(6)}px ${FONT}`;ctx.textAlign='center';
-        ctx.fillText(name,(cx+w/2)*K,(32+RH*0.7)*K);
-        cx+=w;
-      });
-      for(let i=0;i<tb.rows;i++){
-        const idx=gI*tb.rows+i;if(idx>=D.pts.length)break;
-        const p=D.pts[idx];const vals=[(D.pts.length===1?'P1':'V'+(idx+1)),p.e.toFixed(2),p.n.toFixed(2),p.lat.toFixed(6),p.lon.toFixed(6)];
-        let x=gx;
-        cols.forEach(([n,f],ci)=>{
-          const w=gw*f;ctx.fillStyle='#000';ctx.font=`${ci===0?'bold ':''}${pt(6.4)}px ${FONT}`;ctx.textAlign='center';
-          ctx.fillText(vals[ci],(x+w/2)*K,(32+RH*(i+1)+RH*0.7)*K);x+=w;
-        });
-      }
-      // grelha
-      ctx.lineWidth=0.15*K;ctx.strokeStyle='#555';
-      for(let i=0;i<=tb.rows+1;i++){ctx.beginPath();ctx.moveTo(gx*K,(32+RH*i)*K);ctx.lineTo((gx+gw)*K,(32+RH*i)*K);ctx.stroke();}
-      let x=gx;cols.forEach(([n,f])=>{ctx.beginPath();ctx.moveTo(x*K,32*K);ctx.lineTo(x*K,(32+tb.h)*K);ctx.stroke();x+=gw*f;});
-      ctx.beginPath();ctx.moveTo((gx+gw)*K,32*K);ctx.lineTo((gx+gw)*K,(32+tb.h)*K);ctx.stroke();
-      box(ctx,{x:gx,y:32,w:gw,h:tb.h},0.3);
-    }
-  }
-
-  /* painéis de mapa */
-  prep.forEach(p=>p.draw(ctx));
-
-  /* bloco inferior */
-  const f=D.f;
-  // inserção "terreno localizado"
-  const labI={x:X,y:bTop,w:60,h:5};
-  box(ctx,labI);
-  ctx.fillStyle=RED;ctx.font=`bold ${pt(6.4)}px ${FONT}`;ctx.textAlign='left';ctx.fillText('TERRENO LOCALIZADO',(X+1.5)*K,(bTop+3.5)*K);
-  box(ctx,{x:X,y:bTop+5,w:60,h:41});
-  const rEsc={x:X,y:bTop+46,w:30,h:14},rDat={x:X+30,y:bTop+46,w:30,h:14};
-  field(ctx,rEsc,'ESCALA',`Satélite 1:${denB}\nSituação 1:${denA}`,{max:7.5,min:5});
-  const dd=f.data?f.data.split('-').reverse().join('.'):'—';
-  field(ctx,rDat,'DATA',dd,{max:10});
-  // coluna M1
-  const m1x=X+60;
-  field(ctx,{x:m1x,y:bTop,w:38,h:14},'FOLHA',f.folha,{max:10});
-  const rTh={x:m1x,y:bTop+14,w:38,h:26};box(ctx,rTh);
-  drawThumb(ctx,D,rTh);
-  field(ctx,{x:m1x,y:bTop+40,w:38,h:20},'ESPECIALIDADE',f.especialidade.toUpperCase(),{max:10});
-  // coluna M2 esquerda
-  const m2x=m1x+38,m2w=62;
-  field(ctx,{x:m2x,y:bTop,w:m2w,h:20},'PROPRIETÁRIO',f.proprietario.toUpperCase(),{max:9});
-  const loc=[f.rua?f.rua.toUpperCase():'',f.bairro?'BAIRRO '+f.bairro.toUpperCase():'',f.municipio?'MUNICÍPIO DE '+f.municipio.toUpperCase():'',f.provincia.toUpperCase()].filter(Boolean).join('\n');
-  field(ctx,{x:m2x,y:bTop+20,w:m2w,h:22},'LOCALIDADE',loc,{max:9});
-  const rCr={x:m2x,y:bTop+42,w:m2w,h:18};box(ctx,rCr);
-  textBlock(ctx,'CROQUIS DE LOCALIZAÇÃO',{x:rCr.x+1.5,y:rCr.y+1,w:rCr.w-3,h:7},9.5,6,'bold',RED);
-  textBlock(ctx,'FINS: '+(f.fins||'—').toUpperCase(),{x:rCr.x+1.5,y:rCr.y+8,w:rCr.w-3,h:9},8,5,'bold',RED);
-  // coluna M2 direita
-  const m3x=m2x+m2w,m3w=28;
-  const areaTxt=f.areaManual||(D.area!==undefined?(D.area>=10000?`${Math.round(D.area)} m²\n(${(D.area/10000).toFixed(2)} ha)`:`${Math.round(D.area)} m²`):'—');
-  const perTxt=f.perimManual||(D.perim!==undefined?D.perim.toFixed(1)+' m':'—');
-  field(ctx,{x:m3x,y:bTop,w:m3w,h:13},'ÁREA',areaTxt,{max:9});
-  field(ctx,{x:m3x,y:bTop+13,w:m3w,h:13},'PERÍMETRO',perTxt,{max:9});
-  const rTe={x:m3x,y:bTop+26,w:m3w,h:34};box(ctx,rTe);lab(ctx,rTe,'TÉCNICO');
-  if(sigImg)contain(ctx,sigImg,{x:rTe.x+1.5,y:rTe.y+4,w:rTe.w-3,h:17});
-  if(f.tecnico)textBlock(ctx,f.tecnico,{x:rTe.x+1.2,y:rTe.y+22,w:rTe.w-2.4,h:11},7.5,4.6,'bold','#000');
-
-  if(D.notes.length)cv._notes=D.notes;
-  cv._loaded=prep.reduce((a,p)=>a+p.loaded,0);cv._total=prep.reduce((a,p)=>a+p.total,0);
-  cv._info={denA,denB,denI};
-  return cv;
-}
-
-function drawThumb(ctx,D,r){
-  const pts=D.pts;if(!pts.length)return;
-  const pad=4,aw=r.w-pad*2,ah=r.h-pad*2;
-  const w=Math.max(D.bw,0.01),h=Math.max(D.bh,0.01),s=Math.min(aw/w,ah/h);
-  const ox=r.x+pad+(aw-w*s)/2,oy=r.y+pad+(ah-h*s)/2+h*s;
-  const X_=p=>(ox+(p.e-D.bbox.e0)*s)*K,Y_=p=>(oy-(p.n-D.bbox.n0)*s)*K;
-  if(pts.length>=3){
-    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(X_(p),Y_(p)):ctx.moveTo(X_(p),Y_(p)));ctx.closePath();
-    ctx.fillStyle='#8b1a2b';ctx.fill();ctx.lineWidth=0.3*K;ctx.strokeStyle='#000';ctx.lineJoin='round';ctx.stroke();
-  }else{
-    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(X_(p),Y_(p)):ctx.moveTo(X_(p),Y_(p)));
-    ctx.lineWidth=0.5*K;ctx.strokeStyle='#8b1a2b';ctx.stroke();
-    pts.forEach(p=>{ctx.beginPath();ctx.arc(X_(p),Y_(p),1*K,0,Math.PI*2);ctx.fillStyle='#8b1a2b';ctx.fill();});
-  }
-}
-
-/* ---------- Interface ---------- */
-const isDesk=()=>window.matchMedia('(min-width:960px)').matches;
-let curTab='dados',dirty=true,timer=0,lastCanvas=null;
-
-function showMsg(txt,cls){const m=$('msg');m.className=txt?cls:'';m.textContent=txt||'';}
-function setTab(v){
-  curTab=v;
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
-  window.scrollTo(0,0);
-  if(v==='coords')setTimeout(()=>{initMap();if(map){map.invalidateSize();syncMarkers(true);}},60);
-  if(v==='folha'&&dirty)preview();
-}
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.v));
-
-async function preview(){
-  dirty=false;
-  const st=$('state');
-  const D=buildData();
-  if(D.error){showMsg(D.error,'err');$('ph').style.display='block';$('prev').style.display='none';st.textContent='';return;}
-  showMsg(D.notes.length?D.notes[0]:`${D.pts.length} vértice(s) lido(s) · zona ${D.zone}${D.south?'S':'N'}`+(D.area!==undefined?` · área ${Math.round(D.area)} m² · perímetro ${D.perim.toFixed(1)} m`:''),'ok');
-  st.textContent='A carregar mapas…';
-  try{
-    const cv=await renderSheet(130);
-    const p=$('prev');p.width=cv.width;p.height=cv.height;p.getContext('2d').drawImage(cv,0,0);
-    p.style.display='block';$('ph').style.display='none';lastCanvas=cv;
-    st.textContent=cv._loaded?`Mapas carregados (${cv._loaded}/${cv._total} imagens). Escalas: satélite 1:${cv._info.denB}, situação 1:${cv._info.denA}.`:'Não foi possível carregar as imagens do mapa. Verifique a internet.';
-  }catch(e){st.textContent='';showMsg(e.message,'err');}
-}
-function schedule(){
-  dirty=true;clearTimeout(timer);
-  timer=setTimeout(()=>{
-    const D=buildData();showMsg(D.error||'', 'err');if(!D.error){showMsg(D.notes.length?D.notes[0]:`${D.pts.length} vértice(s) lido(s)`+(D.area!==undefined?` · área ${Math.round(D.area)} m² · perímetro ${D.perim.toFixed(1)} m`:''),'ok');}
-    syncMarkers(false);
-    if(isDesk()||curTab==='folha')preview();
-  },800);
-}
-document.querySelectorAll('input,select,textarea').forEach(el=>{
-  if(el.type==='file'||el.id==='search')return;
-  el.addEventListener('input',schedule);el.addEventListener('change',schedule);
-});
-
-function readImg(file,cb){
-  if(!file)return cb(null,'');
-  const fr=new FileReader();
-  fr.onload=()=>{const i=new Image();i.onload=()=>cb(i,fr.result);i.src=fr.result;};fr.readAsDataURL(file);
-}
-$('logo').onchange=e=>readImg(e.target.files[0],(i,d)=>{logoImg=i;logoData=d;schedule();});
-$('sig').onchange=e=>readImg(e.target.files[0],(i,d)=>{sigImg=i;sigData=d;schedule();});
-
-/* botões das coordenadas */
-function addLine(line){const t=$('pts');t.value=(t.value.trim()?t.value.trim()+'\n':'')+line;schedule();}
-function vertexLine(lat,lon){
-  if(g('mode')==='utm'){const z=parseInt(g('zone'))||zoneFromLon(lon);const u=toUTM(lat,lon,z);return u.e.toFixed(2)+' '+u.n.toFixed(2);}
-  return lat.toFixed(7)+', '+lon.toFixed(7);
-}
-$('bGps').onclick=()=>{
-  if(!navigator.geolocation){showMsg('Este aparelho não permite GPS no navegador.','err');return;}
-  showMsg('A obter posição… fique parado uns segundos.','ok');
-  navigator.geolocation.getCurrentPosition(p=>{addLine(vertexLine(p.coords.latitude,p.coords.longitude));showMsg('Ponto GPS adicionado (precisão ±'+Math.round(p.coords.accuracy)+' m).','ok');},
-    ()=>showMsg('Sem acesso ao GPS. Ative a localização e permita o acesso.','err'),{enableHighAccuracy:true,timeout:25000});
-};
-$('bUndo').onclick=()=>{const l=$('pts').value.trim().split('\n');l.pop();$('pts').value=l.join('\n');schedule();};
-$('bClr').onclick=()=>{$('pts').value='';showMsg('','');schedule();};
-$('bEx').onclick=()=>{
-  $('mode').value='dec';$('hemi').value='S';
-  $('pts').value='-8.79050, 13.37700\n-8.79050, 13.37712\n-8.79062, 13.37712\n-8.79062, 13.37700';
-  schedule();
-};
-
-/* mapa para marcar pontos */
-let map=null,layerGroup=null;
-function initMap(){
-  if(map||typeof L==='undefined'||!$('pick'))return;
-  map=L.map('pick').setView([-8.84,13.23],12);
-  L.tileLayer(SAT_URL,{maxNativeZoom:18,maxZoom:21,attribution:'Esri, Maxar, Earthstar Geographics'}).addTo(map);
-  layerGroup=L.layerGroup().addTo(map);
-  map.on('click',e=>addLine(vertexLine(e.latlng.lat,e.latlng.lng)));
-}
-function syncMarkers(fit){
-  if(!map||!layerGroup)return;
-  layerGroup.clearLayers();
-  const D=buildData();if(D.error||!D.pts.length)return;
-  const ll=D.pts.map(p=>[p.lat,p.lon]);
-  if(ll.length>=3)L.polygon(ll,{color:'#ff3030',weight:2,fillOpacity:.2}).addTo(layerGroup);
-  else if(ll.length===2)L.polyline(ll,{color:'#ff3030',weight:2}).addTo(layerGroup);
-  ll.forEach((c,i)=>L.marker(c,{icon:L.divIcon({className:'',html:'<div class="mk">'+(i+1)+'</div>',iconSize:[22,22],iconAnchor:[11,11]}),interactive:false}).addTo(layerGroup));
-  if(fit)map.fitBounds(L.latLngBounds(ll).pad(0.6),{maxZoom:19});
-}
-$('bSearch').onclick=async()=>{
-  const q=g('search');if(!q)return;
-  initMap();
-  try{
-    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ao&q='+encodeURIComponent(q));
-    const j=await r.json();
-    if(!j.length){showMsg('Local não encontrado. Tente outro nome.','err');return;}
-    map.setView([parseFloat(j[0].lat),parseFloat(j[0].lon)],17);
-  }catch(e){showMsg('A pesquisa precisa de internet.','err');}
-};
-$('search').addEventListener('keydown',e=>{if(e.key==='Enter')$('bSearch').click();});
-
-/* exportação */
-function download(blob,name){
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
-  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
-}
-function fname(ext){
-  const s=(g('proprietario')||'croquis').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').slice(0,40);
-  return `croquis_${s}_${g('data')||'sem-data'}.${ext}`;
-}
-const toBlob=(cv,type,q)=>new Promise(r=>cv.toBlob(r,type,q));
-function buildPDF(jpg,w,h){
-  const enc=new TextEncoder(),parts=[],offs=[];let pos=0;
-  const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);pos+=b.length;};
-  push('%PDF-1.4\n');
-  offs[1]=pos;push('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
-  offs[2]=pos;push('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
-  offs[3]=pos;push('3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n');
-  offs[4]=pos;push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`);push(jpg);push('\nendstream\nendobj\n');
-  const content='q 595.28 0 0 841.89 0 0 cm /Im0 Do Q';
-  offs[5]=pos;push(`5 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj\n`);
-  const xref=pos;
-  push('xref\n0 6\n0000000000 65535 f \n');
-  for(let i=1;i<=5;i++)push(String(offs[i]).padStart(10,'0')+' 00000 n \n');
-  push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
-  return new Blob(parts,{type:'application/pdf'});
-}
-async function exportSheet(kind){
-  const st=$('state');
-  const D=buildData();if(D.error){showMsg(D.error,'err');setTab('coords');return;}
-  const dpi=parseInt(g('dpi'))||300;
-  st.textContent=`A gerar a folha a ${dpi} dpi… pode demorar um pouco.`;
-  try{
-    const cv=await renderSheet(dpi);
-    if(!cv._loaded){st.textContent='Sem imagens de mapa. Ligue-se à internet e tente de novo.';return;}
-    if(kind==='pdf'){
-      const jb=await toBlob(cv,'image/jpeg',0.95);
-      const jpg=new Uint8Array(await jb.arrayBuffer());
-      download(buildPDF(jpg,cv.width,cv.height),fname('pdf'));
-    }else{
-      download(await toBlob(cv,'image/png'),fname('png'));
-    }
-    st.textContent='Pronto. O ficheiro foi descarregado.';
-  }catch(e){st.textContent='';showMsg('Falhou: '+e.message+' Tente uma qualidade mais baixa (200 dpi).','err');}
-}
-$('bPdf').onclick=()=>exportSheet('pdf');
-$('bPng').onclick=()=>exportSheet('png');
-$('bRef').onclick=()=>{cache.clear();preview();};
-
-/* guardar / abrir projeto */
-const IDS=['titulo','proprietario','rua','bairro','municipio','provincia','folha','especialidade','fins','data','mode','zone','hemi','pts','tecnico','empresa','contacto','escalaSat','escalaTopo','estiloTopo','zoomMax','raio','tileUrl','areaManual','perimManual','dpi'];
-$('bSave').onclick=()=>{
-  const o={};IDS.forEach(i=>o[i]=$(i).value);o._logo=logoData;o._sig=sigData;
-  download(new Blob([JSON.stringify(o)],{type:'application/json'}),fname('json').replace('croquis_','projeto_'));
-};
-$('bOpen').onclick=()=>$('fOpen').click();
-$('fOpen').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const fr=new FileReader();
-  fr.onload=()=>{
-    try{
-      const o=JSON.parse(fr.result);IDS.forEach(i=>{if(o[i]!==undefined)$(i).value=o[i];});
-      logoData=o._logo||'';sigData=o._sig||'';
-      const mk=(d,set)=>{if(!d)return set(null);const i=new Image();i.onload=()=>set(i);i.src=d;};
-      mk(logoData,i=>{logoImg=i;schedule();});mk(sigData,i=>{sigImg=i;schedule();});
-      schedule();
-    }catch(err){showMsg('Ficheiro de projeto inválido.','err');}
-  };
-  fr.readAsText(f);e.target.value='';
-};
-
-/* arranque */
-$('data').value=new Date().toISOString().slice(0,10);
-if(isDesk()){initMap();setTimeout(()=>{if(map)map.invalidateSize();},200);}
-window.addEventListener('resize',()=>{if(map)map.invalidateSize();});
-})();
-</script>
+      <div class="sheettable"><table><thead><tr><th>Vértice</th><th>Este UTM (m)</th><th>Norte UTM (m)</th><th>Latitude</th><th>Longitude</th></tr></thead><tbody id="printVertices"></tbody></table></div>
+      <p class="sheetfoot">Esboço de localização para referência. Dimensões e vértices calculados com base nos dados fornecidos; confirmar no terreno. Cartografia © Esri e respetivos fornecedores.</p>
+    </section>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+  (()=>{'use strict';
+    const $=id=>document.getElementById(id), rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+    const A=6378137,F=1/298.257223563,E2=F*(2-F),EP2=E2/(1-E2),K0=.9996;
+    const ids=['owner','responsible','district','municipality','province','reference','purpose','phone','date','lat','lon','anchor','width','length','azimuth','title','specialty'];
+    const val=id=>$(id).value.trim();
+    const zoneFor=lon=>Math.max(1,Math.min(60,Math.floor((lon+180)/6)+1));
+    function meridian(p){return A*((1-E2/4-3*E2**2/64-5*E2**3/256)*p-(3*E2/8+3*E2**2/32+45*E2**3/1024)*Math.sin(2*p)+(15*E2**2/256+45*E2**3/1024)*Math.sin(4*p)-(35*E2**3/3072)*Math.sin(6*p));}
+    function toUtm(lat,lon,z){const p=rad(lat),l=rad(lon),l0=rad(z*6-183),s=Math.sin(p),c=Math.cos(p),t=Math.tan(p),N=A/Math.sqrt(1-E2*s*s),T=t*t,C=EP2*c*c,D=c*(l-l0),M=meridian(p);const e=K0*N*(D+(1-T+C)*D**3/6+(5-18*T+T*T+72*C-58*EP2)*D**5/120)+500000;let n=K0*(M+N*t*(D*D/2+(5-T+9*C+4*C*C)*D**4/24+(61-58*T+T*T+600*C-330*EP2)*D**6/720));if(lat<0)n+=1e7;return{e,n};}
+    function fromUtm(e,n,z,south){const x=e-500000,y=south?n-1e7:n,M=y/K0,mu=M/(A*(1-E2/4-3*E2**2/64-5*E2**3/256)),e1=(1-Math.sqrt(1-E2))/(1+Math.sqrt(1-E2));const p1=mu+(3*e1/2-27*e1**3/32)*Math.sin(2*mu)+(21*e1**2/16-55*e1**4/32)*Math.sin(4*mu)+(151*e1**3/96)*Math.sin(6*mu)+(1097*e1**4/512)*Math.sin(8*mu);const s=Math.sin(p1),c=Math.cos(p1),t=Math.tan(p1),N1=A/Math.sqrt(1-E2*s*s),T1=t*t,C1=EP2*c*c,R1=A*(1-E2)/Math.pow(1-E2*s*s,1.5),D=x/(N1*K0);const lat=p1-(N1*t/R1)*(D*D/2-(5+3*T1+10*C1-4*C1*C1-9*EP2)*D**4/24+(61+90*T1+298*C1+45*T1*T1-252*EP2-3*C1*C1)*D**6/720);const lon=rad(z*6-183)+(D-(1+2*T1+C1)*D**3/6+(5-2*C1+28*T1-3*C1*C1+8*EP2+24*T1*T1)*D**5/120)/c;return{lat:deg(lat),lon:deg(lon)};}
+    function compute(){const lat=Number(val('lat').replace(',','.')),lon=Number(val('lon').replace(',','.')),w=Number(val('width')),h=Number(val('length')),az=Number(val('azimuth'));if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)throw Error('Indique uma latitude (−90 a 90) e longitude (−180 a 180) válidas em graus decimais.');if(!(w>0&&h>0&&w<=100000&&h<=100000))throw Error('As dimensões devem ser maiores que zero.');if(!Number.isFinite(az))throw Error('Indique um azimute válido.');const z=zoneFor(lon),south=lat<0,center=toUtm(lat,lon,z),a=rad(((az%360)+360)%360),u={e:Math.sin(a),n:Math.cos(a)},v={e:Math.sin(a+Math.PI/2),n:Math.cos(a+Math.PI/2)};const corners=[[-1,-1],[1,-1],[1,1],[-1,1]];const pts=corners.map(([su,sv])=>{let e=center.e+su*w/2*u.e+sv*h/2*v.e,n=center.n+su*w/2*u.n+sv*h/2*v.n;if(val('anchor')==='v1'){e+=w/2*u.e+h/2*v.e;n+=w/2*u.n+h/2*v.n;}const ll=fromUtm(e,n,z,south);return{e,n,lat:ll.lat,lon:ll.lon};});return{lat,lon,z,south,w,h,az,area:w*h,perimeter:2*(w+h),pts};}
+    let map,printMap,marker,polygon,printMarker,printPolygon,picking=false;
+    function pinIcon(text){return L.divIcon({className:'',html:`<div style="background:#176b52;color:#fff;border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:25px;height:25px;box-shadow:0 1px 5px #0008;display:grid;place-items:center"><span style="transform:rotate(45deg);font:bold 10px sans-serif">${text}</span></div>`,iconSize:[25,25],iconAnchor:[12,24]});}
+    function initMaps(){if(!window.L)return;const base={attribution:'Tiles © Esri — Sources: Esri, Maxar, Earthstar Geographics',maxZoom:19};map=L.map('map').setView([-8.8750278,13.3389444],17);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',base).addTo(map);printMap=L.map('printMap',{zoomControl:false,attributionControl:true,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false}).setView([-8.8750278,13.3389444],17);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',base).addTo(printMap);map.on('click',e=>{if(!picking)return;$('lat').value=e.latlng.lat.toFixed(7);$('lon').value=e.latlng.lng.toFixed(7);picking=false;$('pickPoint').textContent='Escolher ponto no mapa';$('coordStatus').textContent='Ponto de referência atualizado pelas coordenadas do mapa.';render();});map.on('tileload',()=>{$('mapStatus').textContent='Imagem de satélite disponível';});map.on('tileerror',()=>{$('mapStatus').textContent='Algumas imagens não estão disponíveis';});}
+    function setText(id,text){$(id).textContent=text||'—';}
+    function rowFor(p,i){const tr=document.createElement('tr');[`V${i+1}`,p.e.toFixed(2),p.n.toFixed(2),p.lat.toFixed(7),p.lon.toFixed(7)].forEach(t=>{const td=document.createElement('td');td.textContent=t;tr.appendChild(td);});return tr;}
+    function updateLayers(D){const center=[D.lat,D.lon],bounds=D.pts.map(p=>[p.lat,p.lon]);if(marker)map.removeLayer(marker);if(polygon)map.removeLayer(polygon);if(printMarker)printMap.removeLayer(printMarker);if(printPolygon)printMap.removeLayer(printPolygon);marker=L.marker(center,{icon:pinIcon('R'),title:'Ponto de referência'}).addTo(map);polygon=L.polygon(bounds,{color:'#c43732',weight:3,fillColor:'#e55649',fillOpacity:.2}).addTo(map);printMarker=L.marker(center,{icon:pinIcon('R'),title:'Ponto de referência'}).addTo(printMap);printPolygon=L.polygon(bounds,{color:'#c43732',weight:3,fillColor:'#e55649',fillOpacity:.2}).addTo(printMap);const b=polygon.getBounds().pad(.35);map.fitBounds(b,{maxZoom:19});printMap.fitBounds(b,{maxZoom:19});setTimeout(()=>{map.invalidateSize();printMap.invalidateSize();},100);}
+    function render(){try{const D=compute();$('coordStatus').className='status success';$('coordStatus').textContent=`Referência: ${D.lat.toFixed(7)}, ${D.lon.toFixed(7)} · UTM ${D.z}${D.south?'S':'N'}`;$('area').textContent=`${D.area.toLocaleString('pt-PT')} m²`;$('perimeter').textContent=`${D.perimeter.toLocaleString('pt-PT')} m`;$('utmZone').textContent=`${D.z}${D.south?'S':'N'}`;$('vertices').replaceChildren(...D.pts.map(rowFor));$('printVertices').replaceChildren(...D.pts.map(rowFor));updateLayers(D);syncSheet(D);}catch(e){$('coordStatus').className='status error';$('coordStatus').textContent=e.message;}}
+    function syncSheet(D){setText('printTitle',val('title').toUpperCase());setText('sOwner',val('owner'));setText('sResponsible',val('responsible'));setText('sPurpose',val('purpose'));setText('sLocation',[val('district'),val('municipality'),val('province'),val('reference')].filter(Boolean).join(' · '));setText('sCoords',`${D.lat.toFixed(7)}, ${D.lon.toFixed(7)} · UTM ${D.z}${D.south?'S':'N'}`);setText('sSize',`${D.w} × ${D.h} m · ${D.area} m² · ${D.perimeter} m`);setText('sSpecialty',val('specialty'));setText('sPhone',val('phone'));setText('sDate',val('date')?new Date(`${val('date')}T00:00:00`).toLocaleDateString('pt-PT'):'—');}
+    ids.forEach(id=>$(id).addEventListener('input',render));$('pickPoint').onclick=()=>{picking=!picking;$('pickPoint').textContent=picking?'Toque no mapa para marcar…':'Escolher ponto no mapa';$('coordStatus').textContent=picking?'Selecione no mapa o ponto confirmado. O polígono será atualizado.':'';};$('locate').onclick=()=>{if(!navigator.geolocation){$('coordStatus').textContent='Este navegador não disponibiliza GPS.';return;}$('coordStatus').textContent='A obter posição GPS…';navigator.geolocation.getCurrentPosition(p=>{$('lat').value=p.coords.latitude.toFixed(7);$('lon').value=p.coords.longitude.toFixed(7);$('coordStatus').textContent=`GPS obtido (precisão indicada pelo aparelho: ±${Math.round(p.coords.accuracy)} m).`;render();},()=>{$('coordStatus').textContent='Não foi possível obter GPS. Verifique as permissões e tente novamente.';},{enableHighAccuracy:true,timeout:20000});};$('maps').onclick=()=>{try{const D=compute();window.open(`https://www.google.com/maps?q=${D.lat},${D.lon}`,'_blank','noopener');}catch(e){$('coordStatus').textContent=e.message;}};$('print').onclick=()=>{try{render();if(!$('coordStatus').classList.contains('error')){printMap.invalidateSize();setTimeout(()=>window.print(),300);}}catch(e){$('formStatus').textContent=e.message;}};
+    function project(){const o={};ids.forEach(id=>o[id]=$(id).value);return o;}$('save').onclick=()=>{const blob=new Blob([JSON.stringify(project(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='croquis-projeto.json';a.click();URL.revokeObjectURL(a.href);$('formStatus').textContent='Projeto guardado em ficheiro JSON.';};$('load').onclick=()=> $('file').click();$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);ids.forEach(id=>{if(o[id]!==undefined)$(id).value=o[id];});render();$('formStatus').textContent='Projeto carregado.';}catch{$('formStatus').textContent='Ficheiro de projeto inválido.';}};r.readAsText(f);e.target.value='';};window.addEventListener('beforeprint',()=>{if(printMap){printMap.invalidateSize();try{printMap.fitBounds(polygon.getBounds().pad(.35));}catch{}}});
+    $('date').value=new Date().toISOString().slice(0,10);initMaps();render();
+  })();
+  </script>
 </body>
 </html>
